@@ -1,0 +1,104 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2023 Akram Louze
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package me.akraml.serversync;
+
+import me.akraml.serversync.server.Server;
+import me.akraml.serversync.server.ServerImpl;
+
+import java.time.Duration;
+import java.util.*;
+
+/**
+ * Manages a collection of servers and provides utility methods for server management tasks.
+ * This class also manages a heartbeat task to periodically check for server activity and
+ * removes any server that hasn't sent a heartbeat signal within a specified time frame.
+ *
+ * @version 1.0-SNAPSHOT
+ */
+public abstract class ServersManager {
+
+    /** Timer to schedule and manage the heartbeat task. */
+    private final Timer timer =  new Timer();
+
+    /** Map storing the servers using their names as the key. */
+    private final Map<String, ServerImpl> servers = new HashMap<>();
+
+    /**
+     * Starts a recurring task to check servers for their heartbeat signal.
+     * Servers that haven't sent a heartbeat signal within the last 30 seconds will be removed.
+     */
+    public void startHeartbeatTask() {
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                final List<ServerImpl> toRemove =  new ArrayList<>();
+                servers.values().forEach(server -> {
+                    if (System.currentTimeMillis() - server.getLastHeartbeat() > 30000) {
+                        toRemove.add(server);
+                    }
+                });
+                toRemove.forEach(server -> removeServer(server));
+                toRemove.clear();
+            }
+        }, 0L, Duration.ofSeconds(30).toMillis());
+    }
+
+    /**
+     * Retrieves a server instance by its name.
+     *
+     * @param name The name of the server.
+     * @return The server instance or null if not found.
+     */
+    public Server getServer(String name) {
+        return this.servers.get(name);
+    }
+
+    /**
+     * Adds a server to the managed collection of servers.
+     *
+     * @param server The server to be added.
+     */
+    public void addServer(Server server) {
+        this.servers.put(server.getName(), (ServerImpl) server);
+    }
+
+    /**
+     * Removes a server from the managed collection of servers.
+     * Also, triggers an unregister action specific to the proxy.
+     *
+     * @param server The server to be removed.
+     */
+    public void removeServer(Server server) {
+        unregisterFromProxy(server);
+        this.servers.remove(server.getName());
+    }
+
+    /**
+     * Abstract method that should be implemented to unregister a server from the associated proxy.
+     *
+     * @param server The server to be unregistered from the proxy.
+     */
+    protected abstract void unregisterFromProxy(Server server);
+}
