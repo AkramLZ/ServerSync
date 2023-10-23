@@ -40,6 +40,12 @@ public final class ServerImpl implements Server {
     /** The name of the server. */
     private final String name;
 
+    /** The IP address of the server. */
+    private final String ip;
+
+    /** The port which the server is running on */
+    private final int port;
+
     /** A map storing online players using their UUIDs as the key. */
     private final Map<UUID, SyncPlayer> onlinePlayers = new HashMap<>();
 
@@ -53,14 +59,30 @@ public final class ServerImpl implements Server {
      * Constructs a new ServerImpl with the given server name.
      *
      * @param name The name of the server.
+     * @param ip   The address of the server.
+     * @param port The port which the server is running on.
      */
-    public ServerImpl(final String name) {
+    public ServerImpl(final String name,
+                      final String ip,
+                      final int port) {
         this.name = name;
+        this.ip   = ip;
+        this.port = port;
     }
 
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getIp() {
+        return ip;
+    }
+
+    @Override
+    public int getPort() {
+        return port;
     }
 
     @Override

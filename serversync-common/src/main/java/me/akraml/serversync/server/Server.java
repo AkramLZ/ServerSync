@@ -30,8 +30,7 @@ import java.util.Collection;
 
 /**
  * Represents a server that can be monitored and synchronized with proxy or proxies.
- * This interface provides methods to retrieve the online players, the maximum
- * allowed players, and the time of the last heartbeat signal received from the server.
+ * This interface provides methods to retrieve required information about the server.
  *
  * @version 1.0-SNAPSHOT
  */
@@ -43,6 +42,20 @@ public interface Server {
      * @return {@link Server}'s current name.
      */
     String getName();
+
+    /**
+     * Retrieves the IP address of the current synchronized server.
+     *
+     * @return The IP address of the server.
+     */
+    String getIp();
+
+    /**
+     * Retrieves the port number on which the server is running.
+     *
+     * @return The port number of the server.
+     */
+    int getPort();
 
     /**
      * Retrieves a collection of the players currently online on this server.

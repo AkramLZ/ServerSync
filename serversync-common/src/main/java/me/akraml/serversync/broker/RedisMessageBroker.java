@@ -24,6 +24,8 @@
 
 package me.akraml.serversync.broker;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import me.akraml.serversync.ServersManager;
 import me.akraml.serversync.connection.ConnectionResult;
 import me.akraml.serversync.connection.auth.AuthenticatedConnection;
@@ -32,14 +34,34 @@ import me.akraml.serversync.connection.auth.credentials.RedisCredentialsKeys;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.JedisPubSub;
 
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
 
+/**
+ * A concrete implementation of the {@link MessageBroker} that utilizes Redis as the message broker backend.
+ * This class handles server-related messages by subscribing to a Redis channel and performing
+ * appropriate actions based on the received message. The connection with the Redis server is
+ * managed using a {@link JedisPool}.
+ *
+ * <p>This class also implements {@link AuthenticatedConnection} which mandates methods related to
+ * connection handling and credential management.</p>
+ *
+ * @version 1.0-SNAPSHOT
+ */
 public final class RedisMessageBroker extends MessageBroker implements AuthenticatedConnection<JedisPool> {
 
+    private final Gson gson = new Gson();
     private final ConnectionCredentials credentials;
     private JedisPool pool;
 
+    /**
+     * Constructs a new RedisMessageBroker with the given {@link ServersManager} and {@link ConnectionCredentials}.
+     *
+     * @param serversManager The servers manager to use for actions on servers.
+     * @param credentials The credentials used to establish a connection with Redis.
+     */
     public RedisMessageBroker(final ServersManager serversManager,
                               final ConnectionCredentials credentials) {
         super(serversManager);
@@ -48,6 +70,8 @@ public final class RedisMessageBroker extends MessageBroker implements Authentic
 
     @Override
     public ConnectionResult connect() {
+
+        // Initializes a jedis pool configuration with required information.
         final JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(credentials.getProperty(RedisCredentialsKeys.MAX_TOTAL, Integer.class));
         poolConfig.setMaxIdle(credentials.getProperty(RedisCredentialsKeys.MAX_IDLE, Integer.class));
@@ -59,6 +83,8 @@ public final class RedisMessageBroker extends MessageBroker implements Authentic
         poolConfig.setTimeBetweenEvictionRuns(
                 Duration.ofMillis(credentials.getProperty(RedisCredentialsKeys.TIME_BETWEEN_EVICTION_RUNS, Long.class))
         );
+
+        // Initializes a new jedis pool instance to hold connections on.
         this.pool = new JedisPool(
                 poolConfig,
                 credentials.getProperty(RedisCredentialsKeys.HOST, String.class),
@@ -66,6 +92,8 @@ public final class RedisMessageBroker extends MessageBroker implements Authentic
                 credentials.getProperty(RedisCredentialsKeys.TIMEOUT, Integer.class),
                 credentials.getProperty(RedisCredentialsKeys.PASSWORD, String.class)
         );
+
+        // Tests if the connection works properly and return the result.
         try (final Jedis ignore = pool.getResource()) {
             return ConnectionResult.SUCCESS;
         } catch (final Exception exception) {
@@ -83,4 +111,20 @@ public final class RedisMessageBroker extends MessageBroker implements Authentic
         return credentials;
     }
 
+    @Override
+    public void startHandler() {
+        CompletableFuture.runAsync(() -> {
+            try (final Jedis jedis = getConnection().getResource()) {
+                jedis.subscribe(new JedisPubSub() {
+                    @Override
+                    public void onMessage(String channel, String message) {
+                        onMessageReceive(gson.fromJson(message, JsonObject.class));
+                    }
+                }, "serversync:servers");
+            }
+        }).exceptionally(throwable -> {
+            throwable.printStackTrace(System.err);
+            return null;
+        });
+    }
 }
