@@ -24,11 +24,16 @@
 
 package me.akraml.serversync.broker;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import me.akraml.serversync.player.SyncPlayer;
 import me.akraml.serversync.server.Server;
 import me.akraml.serversync.server.ServersManager;
 import me.akraml.serversync.server.ServerImpl;
 import me.akraml.serversync.server.ServerMessageType;
+
+import java.util.UUID;
 
 /**
  * Abstracts the handling of messages related to servers.
@@ -92,15 +97,73 @@ public abstract class MessageBroker {
                  * For max players, easy just update the integer
                  */
                 case UPDATE: {
-                    // TODO Handle updating
+                    final ServerImpl server = (ServerImpl) serversManager.getServer(name);
+                    // If server is not present, then wait till the heartbeat.
+                    if (server == null) break;
+                    final JsonElement playerUpdateElement = jsonObject.get("playerUpdate");
+                    // If it's not null, then it means we need to update a player state.
+                    if (playerUpdateElement != null) {
+                        final PlayerUpdateState updateState = PlayerUpdateState.valueOf(playerUpdateElement.getAsString());
+                        final String[] playerData = jsonObject.get("playerToUpdate").getAsString().split(";");
+                        final UUID uuid = UUID.fromString(playerData[0]);
+                        final String playerName = playerData[1];
+                        switch (updateState) {
+                            case ADD: {
+                                final SyncPlayer syncPlayer = new SyncPlayer(uuid, playerName);
+                                if (!server.containsPlayer(uuid)) {
+                                    server.addPlayer(syncPlayer);
+                                }
+                                break;
+                            }
+                            case REMOVE: {
+                                final SyncPlayer syncPlayer = server.getPlayer(uuid);
+                                if (syncPlayer != null) {
+                                    server.removePlayer(syncPlayer);
+                                }
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    // Now, we need to perform a check for max players update.
+                    final JsonElement maxPlayersElement = jsonObject.get("maxPlayers");
+                    if (maxPlayersElement != null) {
+                        server.setMaxPlayers(maxPlayersElement.getAsInt());
+                        break;
+                    }
+
                     break;
                 }
                 case HEARTBEAT: {
-                    // TODO Handle heartbeat
+                    ServerImpl server = (ServerImpl) serversManager.getServer(name);
+                    if (server != null) {
+                        server.heartbeat();
+                    } else {
+                        // It means the server is not registered yet, so we need to register it.
+                        final String ip = jsonObject.get("ip").getAsString();
+                        final int port = jsonObject.get("port").getAsInt();
+                        // Initialize a new instance and register it.
+                        server = (ServerImpl) Server.of(name, ip, port);
+                        serversManager.addServer(server);
+                        // Update max players value.
+                        server.setMaxPlayers(jsonObject.get("maxPlayers").getAsInt());
+                        // Add players in the server.
+                        final JsonArray playersArray = jsonObject.getAsJsonArray("players");
+                        for (final JsonElement element : playersArray) {
+                            final String[] playerData = element.getAsString().split(";");
+                            final UUID uuid = UUID.fromString(playerData[0]);
+                            final String playerName = playerData[1];
+                            final SyncPlayer syncPlayer = new SyncPlayer(uuid, playerName);
+                            server.addPlayer(syncPlayer);
+                        }
+                    }
                     break;
                 }
                 case REMOVE: {
-                    // TODO Handle removal
+                    final Server server = serversManager.getServer(name);
+                    if (server != null) {
+                        serversManager.removeServer(server);
+                    }
                     break;
                 }
                 default: {
