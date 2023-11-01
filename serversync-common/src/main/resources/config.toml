@@ -11,15 +11,15 @@ message-broker-service = "REDIS"
 # Here, you can configure important values to use redis as a message broker.
 # Ignore it if you are using RABBITMQ.
 [redis]
-    # Credentials values.
-    host = "0.0.0.0"
-    port = 6379
-    password = "password-here"
-    timeout = 5000 # In milliseconds.
-    # Pool configuration values.
-    max-total = 1
-    max-idle = 1
-    min-idle = 1
-    block-when-exhausted = false
-    min-evictable-idle-time = 60000
-    time-between-eviction-runs = 30000
+# Credentials values.
+host = "0.0.0.0"
+port = 6379
+password = "password-here"
+timeout = 5000 # In milliseconds.
+# Pool configuration values.
+max-total = 1
+max-idle = 1
+min-idle = 1
+block-when-exhausted = false
+min-evictable-idle-time = 60000
+time-between-eviction-runs = 30000
