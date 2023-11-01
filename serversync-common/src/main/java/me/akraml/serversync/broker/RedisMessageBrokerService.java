@@ -48,7 +48,7 @@ import java.util.concurrent.CompletableFuture;
  * <p>This class also implements {@link AuthenticatedConnection} which mandates methods related to
  * connection handling and credential management.</p>
  *
- * @version 1.0-SNAPSHOT
+ * @version 1.0-BETA
  */
 public final class RedisMessageBrokerService extends MessageBrokerService implements AuthenticatedConnection<JedisPool> {
 

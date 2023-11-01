@@ -35,7 +35,7 @@ package me.akraml.serversync.server;
  *     <li>{@link #REMOVE} - Indicates a request or action to remove an existing server.</li>
  * </ul>
  *
- * @version 1.0-SNAPSHOT
+ * @version 1.0-BETA
  */
 public enum ServerMessageType {
 

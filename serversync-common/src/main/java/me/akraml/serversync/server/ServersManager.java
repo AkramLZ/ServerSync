@@ -32,7 +32,7 @@ import java.util.*;
  * This class also manages a heartbeat task to periodically check for server activity and
  * removes any server that hasn't sent a heartbeat signal within a specified time frame.
  *
- * @version 1.0-SNAPSHOT
+ * @version 1.0-BETA
  */
 public abstract class ServersManager {
 

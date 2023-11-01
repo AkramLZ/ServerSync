@@ -33,7 +33,7 @@ import java.util.*;
  * This class holds server-related details such as the server name,
  * online players, the maximum allowed players, and the last heartbeat timestamp.
  *
- * @version 1.0-SNAPSHOT
+ * @version 1.0-BETA
  */
 public final class ServerImpl implements Server {
 

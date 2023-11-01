@@ -41,7 +41,7 @@ import java.util.UUID;
  * and act upon them using a {@link ServersManager}. The specifics of how the messages are
  * received and sent to this handler should be implemented in derived classes.
  *
- * @version 1.0-SNAPSHOT
+ * @version 1.0-BETA
  */
 public abstract class MessageBrokerService {
 

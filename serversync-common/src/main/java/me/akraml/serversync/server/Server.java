@@ -33,7 +33,7 @@ import java.util.UUID;
  * Represents a server that can be monitored and synchronized with proxy or proxies.
  * This interface provides methods to retrieve required information about the server.
  *
- * @version 1.0-SNAPSHOT
+ * @version 1.0-BETA
  */
 public interface Server {
 

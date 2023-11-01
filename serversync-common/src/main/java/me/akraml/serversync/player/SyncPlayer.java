@@ -31,7 +31,7 @@ import java.util.UUID;
  * This class contains information about the player such as UUID and username.
  * It provides a means to uniquely identify a player and get their associated display name.
  *
- * @version 1.0-SNAPSHOT
+ * @version 1.0-BETA
  */
 public final class SyncPlayer {
 
