@@ -166,9 +166,6 @@ public abstract class MessageBrokerService {
                     }
                     break;
                 }
-                default: {
-                    break;
-                }
             }
         } catch (final Exception exception) {
             exception.printStackTrace(System.err);
