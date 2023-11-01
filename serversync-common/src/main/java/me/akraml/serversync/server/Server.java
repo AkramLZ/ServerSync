@@ -27,6 +27,7 @@ package me.akraml.serversync.server;
 import me.akraml.serversync.player.SyncPlayer;
 
 import java.util.Collection;
+import java.util.UUID;
 
 /**
  * Represents a server that can be monitored and synchronized with proxy or proxies.
@@ -65,11 +66,34 @@ public interface Server {
     Collection<SyncPlayer> getOnlinePlayers();
 
     /**
+     * Checks if the current server cache contains a player with the provided UUID.
+     *
+     * @param uuid UUID of the player to check.
+     * @return If player is cached in the server.
+     */
+    boolean containsPlayer(final UUID uuid);
+
+    /**
+     * Retrieves a {@link SyncPlayer} instance by the provided UUID if present.
+     *
+     * @param uuid UUID of the player to retrieve.
+     * @return A cached {@link SyncPlayer} instance, null if there's no instance with such UUID.
+     */
+    SyncPlayer getPlayer(final UUID uuid);
+
+    /**
      * Retrieves the maximum number of players allowed on this server.
      *
      * @return An integer representing the maximum number of players.
      */
     int getMaxPlayers();
+
+    /**
+     * Updates the maximum number of players allowed on this server.
+     *
+     * @param maxPlayers The new integer to represent the maximum number of players.
+     */
+    void setMaxPlayers(final int maxPlayers);
 
     /**
      * Gets the timestamp of the last heartbeat received from this server.

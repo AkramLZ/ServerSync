@@ -90,14 +90,33 @@ public final class ServerImpl implements Server {
         return onlinePlayers.values();
     }
 
+    @Override
+    public boolean containsPlayer(UUID uuid) {
+        return onlinePlayers.containsKey(uuid);
+    }
+
+    @Override
+    public SyncPlayer getPlayer(UUID uuid) {
+        return onlinePlayers.get(uuid);
+    }
+
     /**
      * Adds a player to the server's online players map or updates it if already present.
      *
      * @param syncPlayer The player to be added or updated.
      */
     public void addPlayer(final SyncPlayer syncPlayer) {
-        onlinePlayers.remove(syncPlayer.getUuid());
+        removePlayer(syncPlayer);
         onlinePlayers.put(syncPlayer.getUuid(), syncPlayer);
+    }
+
+    /**
+     * Removes a player from the server's online players map.
+     *
+     * @param syncPlayer The player to be removed.
+     */
+    public void removePlayer(final SyncPlayer syncPlayer) {
+        onlinePlayers.remove(syncPlayer.getUuid());
     }
 
     @Override
@@ -105,11 +124,6 @@ public final class ServerImpl implements Server {
         return maxPlayers;
     }
 
-    /**
-     * Sets the maximum number of players allowed on the server.
-     *
-     * @param maxPlayers The maximum number of players.
-     */
     public void setMaxPlayers(final int maxPlayers) {
         this.maxPlayers = maxPlayers;
     }
