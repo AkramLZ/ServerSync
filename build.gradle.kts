@@ -40,7 +40,6 @@ subprojects {
     dependencies {
         implementation("com.rabbitmq:amqp-client:5.19.0")
         implementation("redis.clients:jedis:5.0.2")
-        implementation("ch.jalu.configme:1.4.1")
         implementation("com.google.code.gson:gson:2.10.1")
     }
 
