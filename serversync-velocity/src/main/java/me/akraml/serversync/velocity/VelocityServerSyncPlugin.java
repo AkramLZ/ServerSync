@@ -92,6 +92,7 @@ public final class VelocityServerSyncPlugin {
         final ConnectionType connectionType = ConnectionType.valueOf(config.getString("message-broker-service"));
         switch (connectionType) {
             case REDIS -> {
+                logger.info("ServerSync will run under Redis message broker...");
                 long redisStartTime = System.currentTimeMillis();
                 final Toml redisTable = config.getTable("redis");
                 final ConnectionCredentials credentials = ConnectionCredentials.newBuilder()
