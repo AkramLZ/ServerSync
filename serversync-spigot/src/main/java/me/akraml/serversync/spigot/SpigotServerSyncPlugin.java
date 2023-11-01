@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.akraml.serversync.bungee;
+package me.akraml.serversync.spigot;
 
 import lombok.Getter;
 import me.akraml.serversync.ServerSync;
@@ -32,42 +32,23 @@ import me.akraml.serversync.connection.ConnectionResult;
 import me.akraml.serversync.connection.ConnectionType;
 import me.akraml.serversync.connection.auth.ConnectionCredentials;
 import me.akraml.serversync.connection.auth.credentials.RedisCredentialsKeys;
-import me.akraml.serversync.server.ServersManager;
-import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.config.Configuration;
-import net.md_5.bungee.config.ConfigurationProvider;
-import net.md_5.bungee.config.YamlConfiguration;
+import me.akraml.serversync.player.SyncPlayer;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.util.stream.Collectors;
 
 /**
- * An implementation for ServerSync in BungeeCord platform.
+ * An implementation for ServerSync in Spigot platform.
  */
 @Getter
-public final class BungeeServerSyncPlugin extends Plugin {
+public final class SpigotServerSyncPlugin extends JavaPlugin {
 
-    private Configuration config;
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Override
-    public void onLoad() {
-        if (!getDataFolder().exists()) {
-            getDataFolder().mkdir();
-        }
-        try {
-            loadConfig();
-        } catch (Exception exception) {
-            exception.printStackTrace(System.err);
-        }
-
-    }
+    private String serverName;
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
         final long start = System.currentTimeMillis();
         getLogger().info("\n" +
                 " __                          __                  \n" +
@@ -77,14 +58,15 @@ public final class BungeeServerSyncPlugin extends Plugin {
                 "\\__/\\___|_|    \\_/ \\___|_|  \\__/\\__, |_| |_|\\___|\n" +
                 "                                |___/            \n");
         getLogger().info("This server is running ServerSync " + VersionInfo.VERSION + " by AkramL.");
-        final ServersManager serversManager = new BungeeServersManager(this);
+        this.serverName = getConfig().getString("server-name");
         // Initialize message broker service.
-        final ConnectionType connectionType = ConnectionType.valueOf(config.getString("message-broker-service"));
+        final ConnectionType connectionType = ConnectionType.valueOf(getConfig().getString("message-broker-service"));
         switch (connectionType) {
             case REDIS: {
                 getLogger().info("ServerSync will run under Redis message broker...");
                 long redisStartTime = System.currentTimeMillis();
-                final Configuration redisSection = config.getSection("redis");
+                final ConfigurationSection redisSection = getConfig().getConfigurationSection("redis");
+                assert redisSection != null;
                 final ConnectionCredentials credentials = ConnectionCredentials.newBuilder()
                         .addKey(RedisCredentialsKeys.HOST, redisSection.getString("host"))
                         .addKey(RedisCredentialsKeys.PORT, redisSection.getInt("port"))
@@ -98,17 +80,17 @@ public final class BungeeServerSyncPlugin extends Plugin {
                         .addKey(RedisCredentialsKeys.BLOCK_WHEN_EXHAUSTED, redisSection.getBoolean("block-when-exhausted"))
                         .build();
                 final RedisMessageBrokerService messageBrokerService = new RedisMessageBrokerService(
-                        serversManager,
+                        null,
                         credentials
                 );
                 final ConnectionResult connectionResult = messageBrokerService.connect();
                 if (connectionResult == ConnectionResult.FAILURE) {
                     getLogger().severe("Failed to connect into redis, please check credentials!");
+                    setEnabled(false);
                     return;
                 }
                 getLogger().info("Successfully connected to redis, process took " + (System.currentTimeMillis() - redisStartTime) + "ms!");
-                messageBrokerService.startHandler();
-                ServerSync.initializeInstance(serversManager, messageBrokerService);
+                ServerSync.initializeInstance(null, messageBrokerService);
                 break;
             }
             case RABBITMQ: {
@@ -116,23 +98,33 @@ public final class BungeeServerSyncPlugin extends Plugin {
                 return;
             }
         }
+        getServer().getPluginManager().registerEvents(new SpigotServerSyncListener(this), this);
+        ServerSync.getInstance().getMessageBrokerService().publishCreate(
+                serverName,
+                getServer().getIp(),
+                getServer().getPort(),
+                getServer().getMaxPlayers()
+        );
+        final int interval = getConfig().getInt("heartbeat-interval");
+        getServer().getScheduler().runTaskTimerAsynchronously(this, () ->
+                ServerSync.getInstance().getMessageBrokerService().publishHeartbeat(
+                        serverName,
+                        getServer().getIp(),
+                        getServer().getPort(),
+                        getServer().getMaxPlayers(),
+                        getServer().getOnlinePlayers().stream()
+                                .map(player -> new SyncPlayer(player.getUniqueId(), player.getName()))
+                                .collect(Collectors.toList())
+        ), interval, interval);
         getLogger().info("ServerSync has fully started in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     @Override
     public void onDisable() {
-        ServerSync.getInstance().getMessageBrokerService().stop();
-    }
-
-    private void loadConfig() throws IOException {
-        final File configFile = new File("config.toml");
-        if (!configFile.exists()) {
-            try (final InputStream inputStream = getClass().getResourceAsStream("/config.yml")) {
-                assert inputStream != null;
-                Files.copy(inputStream, configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }
+        if (ServerSync.getInstance() != null) {
+            ServerSync.getInstance().getMessageBrokerService().publishRemove(serverName);
+            ServerSync.getInstance().getMessageBrokerService().stop();
         }
-        config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(configFile);
     }
 
 }

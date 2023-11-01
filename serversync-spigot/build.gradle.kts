@@ -31,4 +31,10 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.2-R0.1-SNAPSHOT")
+    implementation(project(":serversync-common"))
+}
+
+tasks.compileJava {
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
 }

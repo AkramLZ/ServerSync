@@ -33,7 +33,10 @@ import me.akraml.serversync.server.ServersManager;
 import me.akraml.serversync.server.ServerImpl;
 import me.akraml.serversync.server.ServerMessageType;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Abstracts the handling of messages related to servers.
@@ -74,8 +77,10 @@ public abstract class MessageBrokerService {
                 // Only server name, ip and port
                 case CREATE: {
                     final String ip = jsonObject.get("ip").getAsString();
-                    final int port = jsonObject.get("port").getAsInt();
+                    final int port = jsonObject.get("port").getAsInt(),
+                            maxPlayers = jsonObject.get("maxPlayers").getAsInt();
                     final ServerImpl server = (ServerImpl) Server.of(name, ip, port);
+                    server.setMaxPlayers(maxPlayers);
 
                     if (serversManager.getServer(name) != null) {
                         serversManager.removeServer(server);
@@ -172,6 +177,100 @@ public abstract class MessageBrokerService {
         }
     }
 
+    public void publishPlayerUpdate(final String serverName,
+                                    final SyncPlayer syncPlayer,
+                                    final PlayerUpdateState updateState) {
+        final JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("type", ServerMessageType.UPDATE.name());
+        jsonObject.addProperty("name", serverName);
+        jsonObject.addProperty("playerUpdate", updateState.name());
+        jsonObject.addProperty("playerToUpdate", syncPlayer.getUuid() + ";" + syncPlayer.getUsername());
+        publish(jsonObject);
+    }
+
+    /**
+     * Publishes an update for the maximum number of players allowed on a specific server.
+     * This method constructs a JSON message that updates the maximum player count for the server
+     * with the given name.
+     *
+     * @param serverName The name of the server to update.
+     * @param maxPlayers The new maximum number of players that can join the server.
+     */
+
+    public void publishMaxPlayersUpdate(final String serverName,
+                                        final int maxPlayers) {
+        final JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("type", ServerMessageType.UPDATE.name());
+        jsonObject.addProperty("name", serverName);
+        jsonObject.addProperty("maxPlayers", maxPlayers);
+        publish(jsonObject);
+    }
+
+    /**
+     * Publishes a heartbeat message for a server. The heartbeat contains current data about
+     * the server including its name, IP, port, maximum players, and a list of currently
+     * connected players. This is typically used to show that the server is active and to update
+     * its current state.
+     *
+     * @param serverName The name of the server.
+     * @param ip         The IP address of the server.
+     * @param port       The port on which the server is running.
+     * @param maxPlayers The maximum number of players that can join the server.
+     * @param players    A collection of the current players on the server.
+     */
+    public void publishHeartbeat(final String serverName,
+                                 final String ip,
+                                 final int port,
+                                 final int maxPlayers,
+                                 final Collection<SyncPlayer> players) {
+        final JsonObject jsonObject = new JsonObject();
+        final JsonArray playersArray = new JsonArray();
+        players.forEach(syncPlayer -> playersArray.add(syncPlayer.getUuid() + ";" + syncPlayer.getUsername()));
+        jsonObject.addProperty("type", ServerMessageType.HEARTBEAT.name());
+        jsonObject.addProperty("name", serverName);
+        jsonObject.addProperty("ip", ip);
+        jsonObject.addProperty("port", port);
+        jsonObject.addProperty("maxPlayers", maxPlayers);
+        jsonObject.add("players", playersArray);
+        publish(jsonObject);
+    }
+
+    /**
+     * Publishes a message to create a new server entry. This message contains the necessary
+     * information such as the server's name, IP, port, and the maximum number of players allowed.
+     * This can be used when a new server is being added to the network.
+     *
+     * @param serverName The name of the server to create.
+     * @param ip         The IP address of the server.
+     * @param port       The port on which the server is running.
+     * @param maxPlayers The maximum number of players that can join the server.
+     */
+    public void publishCreate(final String serverName,
+                              final String ip,
+                              final int port,
+                              final int maxPlayers) {
+        final JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("name", serverName);
+        jsonObject.addProperty("ip", ip);
+        jsonObject.addProperty("port", port);
+        jsonObject.addProperty("maxPlayers", maxPlayers);
+        publish(jsonObject);
+    }
+
+    /**
+     * Publishes a message to remove a server from the network. This message instructs that
+     * the server with the given name should be removed, typically because it is no longer
+     * operational or has been decommissioned.
+     *
+     * @param serverName The name of the server to be removed.
+     */
+    public void publishRemove(final String serverName) {
+        final JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("type", ServerMessageType.REMOVE.name());
+        jsonObject.addProperty("name", serverName);
+        publish(jsonObject);
+    }
+
     /**
      * Abstract method that, when implemented, should start the mechanism
      * to begin listening for and handling messages.
@@ -188,14 +287,14 @@ public abstract class MessageBrokerService {
      *
      * @param message Message to publish.
      */
-    public abstract void publish(final String message);
+    public abstract void publish(final JsonObject message);
 
     /**
      * Represents the state of a player update action.
      * This enum is used to indicate whether a player is being added to
      * or removed from a server during an update message process.
      */
-    private enum PlayerUpdateState {
+    public enum PlayerUpdateState {
 
         /** Indicates that a player is being added to the server. */
         ADD,

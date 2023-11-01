@@ -10,10 +10,3 @@ tasks.compileJava {
     sourceCompatibility = "1.8"
     targetCompatibility = "1.8"
 }
-
-tasks.named<ProcessResources>("processResources") {
-    expand("projectVersion" to project.version)
-    filesMatching("bungee.yml") {
-        expand("project.version" to project.version)
-    }
-}

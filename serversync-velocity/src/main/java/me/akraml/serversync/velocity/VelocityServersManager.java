@@ -26,7 +26,6 @@ package me.akraml.serversync.velocity;
 
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
-import lombok.RequiredArgsConstructor;
 import me.akraml.serversync.server.Server;
 import me.akraml.serversync.server.ServersManager;
 

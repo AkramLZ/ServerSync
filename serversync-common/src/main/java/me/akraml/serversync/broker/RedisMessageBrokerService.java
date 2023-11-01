@@ -134,9 +134,9 @@ public final class RedisMessageBrokerService extends MessageBrokerService implem
     }
 
     @Override
-    public void publish(String message) {
+    public void publish(JsonObject message) {
         try(final Jedis jedis = pool.getResource()) {
-            jedis.publish("serversync:servers", message);
+            jedis.publish("serversync:servers", message.toString());
         }
     }
 }

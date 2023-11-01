@@ -73,6 +73,10 @@ subprojects {
         dependsOn(generateVersionClass)
     }
 
+    tasks.processResources {
+        expand("projectVersion" to project.version)
+    }
+
     sourceSets["main"].java.srcDir(File(buildDir, "generated/sources/version"))
 
 }

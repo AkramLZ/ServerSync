@@ -1,5 +1,6 @@
 package me.akraml.serversync.broker;
 
+import com.google.gson.JsonObject;
 import com.rabbitmq.client.Connection;
 import me.akraml.serversync.connection.ConnectionResult;
 import me.akraml.serversync.connection.auth.AuthenticatedConnection;
@@ -30,7 +31,7 @@ public class RabbitMqMessageBrokerService extends MessageBrokerService implement
     }
 
     @Override
-    public void publish(String message) {
+    public void publish(JsonObject message) {
 
     }
 
