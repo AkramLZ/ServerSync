@@ -27,7 +27,7 @@ plugins {
 }
 
 group = "me.akraml"
-version = "1.0-BETA"
+version = "1.0-SNAPSHOT"
 
 subprojects {
     apply(plugin = "java")
@@ -43,5 +43,34 @@ subprojects {
         implementation("ch.jalu.configme:1.4.1")
         implementation("com.google.code.gson:gson:2.10.1")
     }
+
+    val generateVersionClass by tasks.registering {
+        val outputDir = File(project.buildDir, "generated/sources/version")
+        val className = "VersionInfo"
+        val packageName = "me.akraml.serversync"
+        val fileContent = """
+        package $packageName;
+
+        public final class $className {
+            public static final String VERSION = "${project.version}";
+        }
+    """.trimIndent()
+
+        val filePath = packageName.replace('.', File.separatorChar)
+        val file = File(outputDir, filePath)
+
+        doLast {
+            file.mkdirs()
+            val javaFile = File(file, "$className.java")
+            javaFile.writeText(fileContent)
+        }
+        outputs.dir(outputDir)
+    }
+
+    tasks.named("compileJava") {
+        dependsOn(generateVersionClass)
+    }
+
+    sourceSets["main"].java.srcDir(File(buildDir, "generated/sources/version"))
 
 }
