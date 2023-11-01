@@ -45,6 +45,9 @@ public abstract class ServersManager {
     /** Map storing the servers using their names as the key. */
     private final Map<String, ServerImpl> servers = new HashMap<>();
 
+    /** Integers for heartbeat task delay and maximum time to remove the server. */
+    protected int heartbeatSchedulerDelay, maxAliveTime;
+
     /**
      * Starts a recurring task to check servers for their heartbeat signal.
      * Servers that haven't sent a heartbeat signal within the last 30 seconds will be removed.
@@ -55,14 +58,14 @@ public abstract class ServersManager {
             public void run() {
                 final List<ServerImpl> toRemove =  new ArrayList<>();
                 servers.values().forEach(server -> {
-                    if (System.currentTimeMillis() - server.getLastHeartbeat() > 30000) {
+                    if (System.currentTimeMillis() - server.getLastHeartbeat() > maxAliveTime) {
                         toRemove.add(server);
                     }
                 });
                 toRemove.forEach(server -> removeServer(server));
                 toRemove.clear();
             }
-        }, 0L, Duration.ofSeconds(30).toMillis());
+        }, 0L, Duration.ofSeconds(heartbeatSchedulerDelay).toMillis());
     }
 
     /**
