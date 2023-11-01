@@ -22,10 +22,7 @@
  * SOFTWARE.
  */
 
-package me.akraml.serversync;
-
-import me.akraml.serversync.server.Server;
-import me.akraml.serversync.server.ServerImpl;
+package me.akraml.serversync.server;
 
 import java.time.Duration;
 import java.util.*;
@@ -52,7 +49,7 @@ public abstract class ServersManager {
      * Starts a recurring task to check servers for their heartbeat signal.
      * Servers that haven't sent a heartbeat signal within the last 30 seconds will be removed.
      */
-    public void startHeartbeatTask() {
+    public final void startHeartbeatTask() {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -74,7 +71,7 @@ public abstract class ServersManager {
      * @param name The name of the server.
      * @return The server instance or null if not found.
      */
-    public Server getServer(String name) {
+    public final Server getServer(String name) {
         return this.servers.get(name);
     }
 
@@ -83,7 +80,7 @@ public abstract class ServersManager {
      *
      * @param server The server to be added.
      */
-    public void addServer(Server server) {
+    public final void addServer(Server server) {
         this.servers.put(server.getName(), (ServerImpl) server);
     }
 
@@ -93,7 +90,7 @@ public abstract class ServersManager {
      *
      * @param server The server to be removed.
      */
-    public void removeServer(Server server) {
+    public final void removeServer(Server server) {
         unregisterFromProxy(server);
         this.servers.remove(server.getName());
     }

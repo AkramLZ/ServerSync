@@ -62,9 +62,9 @@ public final class ServerImpl implements Server {
      * @param ip   The address of the server.
      * @param port The port which the server is running on.
      */
-    public ServerImpl(final String name,
-                      final String ip,
-                      final int port) {
+    ServerImpl(final String name,
+               final String ip,
+               final int port) {
         this.name = name;
         this.ip   = ip;
         this.port = port;

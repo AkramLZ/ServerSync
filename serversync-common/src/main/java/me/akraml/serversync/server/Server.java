@@ -88,4 +88,18 @@ public interface Server {
         return System.currentTimeMillis() - getLastHeartbeat();
     }
 
+    /**
+     * Initializes a new instance of {@link ServerImpl} from the provided name, ip and port.
+     *
+     * @param name Name of the registered server.
+     * @param ip IP Address of the server.
+     * @param port Port of the server which will be accessed from.
+     * @return New instance of {@link ServerImpl}
+     */
+    static Server of(final String name,
+                      final String ip,
+                      final int port) {
+        return new ServerImpl(name, ip, port);
+    }
+
 }

@@ -26,7 +26,7 @@ package me.akraml.serversync.broker;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import me.akraml.serversync.ServersManager;
+import me.akraml.serversync.server.ServersManager;
 import me.akraml.serversync.connection.ConnectionResult;
 import me.akraml.serversync.connection.auth.AuthenticatedConnection;
 import me.akraml.serversync.connection.auth.ConnectionCredentials;

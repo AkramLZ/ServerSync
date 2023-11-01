@@ -25,11 +25,10 @@
 package me.akraml.serversync.broker;
 
 import com.google.gson.JsonObject;
-import me.akraml.serversync.ServersManager;
+import me.akraml.serversync.server.Server;
+import me.akraml.serversync.server.ServersManager;
 import me.akraml.serversync.server.ServerImpl;
 import me.akraml.serversync.server.ServerMessageType;
-
-import java.util.function.Consumer;
 
 /**
  * Abstracts the handling of messages related to servers.
@@ -66,12 +65,12 @@ public abstract class MessageBroker {
             final String name = jsonObject.get("name").getAsString();
             switch (messageType) {
                 // This will handle server creation message.
-                // What should we published during server creation?
+                // What should we publish during server creation?
                 // Only server name, ip and port
                 case CREATE: {
                     final String ip = jsonObject.get("ip").getAsString();
                     final int port = jsonObject.get("port").getAsInt();
-                    final ServerImpl server = new ServerImpl(name, ip, port);
+                    final ServerImpl server = (ServerImpl) Server.of(name, ip, port);
 
                     if (serversManager.getServer(name) != null) {
                         serversManager.removeServer(server);
