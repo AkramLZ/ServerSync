@@ -53,6 +53,7 @@ import java.nio.file.StandardCopyOption;
 @Plugin(
         id = "serversync",
         name = "ServerSync",
+        description = "Synchronize your spigot servers with proxies and manage them dynamically without extra configuration.",
         authors = "AkramL",
         version = VersionInfo.VERSION
 )
