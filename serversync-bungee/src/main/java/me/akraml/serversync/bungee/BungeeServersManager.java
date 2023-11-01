@@ -14,7 +14,7 @@ import java.net.InetSocketAddress;
  * for BungeeCord.
  */
 @RequiredArgsConstructor
-public class BungeeServersManager extends ServersManager {
+public final class BungeeServersManager extends ServersManager {
 
     private final ProxyServer proxyServer;
 

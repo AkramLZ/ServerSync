@@ -22,7 +22,7 @@ import java.nio.file.StandardCopyOption;
 /**
  * An implementation for ServerSync in BungeeCord platform.
  */
-public class BungeeServerSyncPlugin extends Plugin {
+public final class BungeeServerSyncPlugin extends Plugin {
 
     private Configuration configuration;
 
