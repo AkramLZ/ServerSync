@@ -127,4 +127,9 @@ public final class RedisMessageBrokerService extends MessageBrokerService implem
             return null;
         });
     }
+
+    @Override
+    public void stop() {
+        close();
+    }
 }

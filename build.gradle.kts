@@ -68,7 +68,8 @@ subprojects {
         outputs.dir(outputDir)
     }
 
-    tasks.named("compileJava") {
+    tasks.compileJava {
+        options.encoding = "UTF-8"
         dependsOn(generateVersionClass)
     }
 

@@ -192,4 +192,9 @@ public abstract class MessageBrokerService {
         REMOVE
     }
 
+    /**
+     * Stops and shut-downs the message broker client.
+     */
+    public abstract void stop();
+
 }

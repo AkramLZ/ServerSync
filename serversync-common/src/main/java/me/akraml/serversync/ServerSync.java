@@ -24,7 +24,56 @@
 
 package me.akraml.serversync;
 
+import lombok.Getter;
+import me.akraml.serversync.broker.MessageBrokerService;
+import me.akraml.serversync.server.ServersManager;
+
+/**
+ * The main class for ServerSync, which serves as a singleton instance to coordinate
+ * the servers management and message brokering services.
+ */
+@Getter
 public class ServerSync {
 
+    private static ServerSync INSTANCE;
+
+    private final ServersManager serversManager;
+    private final MessageBrokerService messageBrokerService;
+
+    /**
+     * Private constructor to prevent instantiation from outside and enforce the singleton pattern.
+     *
+     * @param serversManager The servers manager to manage server operations.
+     * @param messageBrokerService The message broker service to handle messaging.
+     */
+    private ServerSync(final ServersManager serversManager,
+                       final MessageBrokerService messageBrokerService) {
+        this.serversManager = serversManager;
+        this.messageBrokerService = messageBrokerService;
+    }
+
+    /**
+     * Retrieves the singleton instance of ServerSync.
+     *
+     * @return The singleton instance of ServerSync.
+     */
+    public static ServerSync getInstance() {
+        return INSTANCE;
+    }
+
+    /**
+     * Initializes the singleton instance of ServerSync. If the instance is already
+     * initialized, this method will throw a {@link RuntimeException} to prevent
+     * re-initialization.
+     *
+     * @param serversManager The servers manager for server operations.
+     * @param messageBrokerService The message broker service for messaging.
+     * @throws RuntimeException if an instance is already initialized.
+     */
+    public static void initializeInstance(final ServersManager serversManager,
+                                          final MessageBrokerService messageBrokerService) {
+        if (INSTANCE != null) throw new RuntimeException("Instance is already initialized");
+        INSTANCE = new ServerSync(serversManager, messageBrokerService);
+    }
 
 }

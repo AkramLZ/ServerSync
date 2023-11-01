@@ -34,3 +34,8 @@ dependencies {
     annotationProcessor("com.velocitypowered:velocity-api:3.2.0-SNAPSHOT")
     implementation(project(":serversync-common"))
 }
+
+tasks.compileJava {
+    sourceCompatibility = "16"
+    targetCompatibility = "16"
+}
