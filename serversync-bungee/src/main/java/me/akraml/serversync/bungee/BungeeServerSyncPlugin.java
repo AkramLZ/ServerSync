@@ -93,6 +93,11 @@ public class BungeeServerSyncPlugin extends Plugin {
         getLogger().info("ServerSync has fully started in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
+    @Override
+    public void onDisable() {
+        ServerSync.getInstance().getMessageBrokerService().stop();
+    }
+
     private void loadConfig() throws IOException {
         final File configFile = new File("config.toml");
         if (!configFile.exists()) {
