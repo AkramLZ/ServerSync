@@ -15,13 +15,17 @@ import me.akraml.serversync.server.ServersManager;
  */
 public class RabbitMqMessageBrokerService extends MessageBrokerService implements AuthenticatedConnection<Connection> {
 
-
     public RabbitMqMessageBrokerService(ServersManager serversManager) {
         super(serversManager);
     }
 
     @Override
     public void startHandler() {
+
+    }
+
+    @Override
+    public void stop() {
 
     }
 
