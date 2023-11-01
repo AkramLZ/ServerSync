@@ -30,6 +30,11 @@ public class RabbitMqMessageBrokerService extends MessageBrokerService implement
     }
 
     @Override
+    public void publish(String message) {
+
+    }
+
+    @Override
     public ConnectionResult connect() {
         return null;
     }

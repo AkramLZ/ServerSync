@@ -132,4 +132,11 @@ public final class RedisMessageBrokerService extends MessageBrokerService implem
     public void stop() {
         close();
     }
+
+    @Override
+    public void publish(String message) {
+        try(final Jedis jedis = pool.getResource()) {
+            jedis.publish("serversync:servers", message);
+        }
+    }
 }

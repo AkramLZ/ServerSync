@@ -179,6 +179,18 @@ public abstract class MessageBrokerService {
     public abstract void startHandler();
 
     /**
+     * Stops and shut-downs the message broker client.
+     */
+    public abstract void stop();
+
+    /**
+     * Publishes a message into the current message broker channel.
+     *
+     * @param message Message to publish.
+     */
+    public abstract void publish(final String message);
+
+    /**
      * Represents the state of a player update action.
      * This enum is used to indicate whether a player is being added to
      * or removed from a server during an update message process.
@@ -191,10 +203,5 @@ public abstract class MessageBrokerService {
         /** Indicates that a player is being removed from the server. */
         REMOVE
     }
-
-    /**
-     * Stops and shut-downs the message broker client.
-     */
-    public abstract void stop();
 
 }
