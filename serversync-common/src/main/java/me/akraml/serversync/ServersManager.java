@@ -62,7 +62,7 @@ public abstract class ServersManager {
                         toRemove.add(server);
                     }
                 });
-                toRemove.forEach(server -> removeServer(server));
+                toRemove.forEach(ServersManager.this::removeServer);
                 toRemove.clear();
             }
         }, 0L, Duration.ofSeconds(heartbeatSchedulerDelay).toMillis());
