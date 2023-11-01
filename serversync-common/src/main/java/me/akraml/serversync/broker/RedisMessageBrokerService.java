@@ -40,7 +40,7 @@ import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * A concrete implementation of the {@link MessageBroker} that utilizes Redis as the message broker backend.
+ * A concrete implementation of the {@link MessageBrokerService} that utilizes Redis as the message broker backend.
  * This class handles server-related messages by subscribing to a Redis channel and performing
  * appropriate actions based on the received message. The connection with the Redis server is
  * managed using a {@link JedisPool}.
@@ -50,7 +50,7 @@ import java.util.concurrent.CompletableFuture;
  *
  * @version 1.0-SNAPSHOT
  */
-public final class RedisMessageBroker extends MessageBroker implements AuthenticatedConnection<JedisPool> {
+public final class RedisMessageBrokerService extends MessageBrokerService implements AuthenticatedConnection<JedisPool> {
 
     private final Gson gson = new Gson();
     private final ConnectionCredentials credentials;
@@ -62,8 +62,8 @@ public final class RedisMessageBroker extends MessageBroker implements Authentic
      * @param serversManager The servers manager to use for actions on servers.
      * @param credentials The credentials used to establish a connection with Redis.
      */
-    public RedisMessageBroker(final ServersManager serversManager,
-                              final ConnectionCredentials credentials) {
+    public RedisMessageBrokerService(final ServersManager serversManager,
+                                     final ConnectionCredentials credentials) {
         super(serversManager);
         this.credentials = credentials;
     }

@@ -43,7 +43,7 @@ import java.util.UUID;
  *
  * @version 1.0-SNAPSHOT
  */
-public abstract class MessageBroker {
+public abstract class MessageBrokerService {
 
     /** The servers manager used to perform actions based on received messages. */
     private final ServersManager serversManager;
@@ -53,7 +53,7 @@ public abstract class MessageBroker {
      *
      * @param serversManager The servers manager to use for actions on servers.
      */
-    public MessageBroker(final ServersManager serversManager) {
+    public MessageBrokerService(final ServersManager serversManager) {
         this.serversManager = serversManager;
     }
 
