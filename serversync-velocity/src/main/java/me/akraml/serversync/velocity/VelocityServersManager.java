@@ -31,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 import me.akraml.serversync.server.Server;
 import me.akraml.serversync.server.ServersManager;
 
+import java.net.InetSocketAddress;
 import java.util.Optional;
 
 /**
@@ -56,5 +57,20 @@ public final class VelocityServersManager extends ServersManager {
         if (optional.isEmpty()) return;
         final ServerInfo serverInfo = optional.get().getServerInfo();
         proxyServer.unregisterServer(serverInfo);
+    }
+
+    /**
+     * Registers a server in the proxy server.
+     * If the server is not registered in the current velocity proxy, it will add it to the network's server list.
+     *
+     * @param server The server to be registered in the proxy.
+     */
+    @Override
+    protected void registerInProxy(Server server) {
+        final ServerInfo serverInfo = new ServerInfo(
+                server.getName(),
+                InetSocketAddress.createUnresolved(server.getIp(), server.getPort())
+        );
+        if (proxyServer.getServer(server.getName()).isEmpty()) proxyServer.registerServer(serverInfo);
     }
 }

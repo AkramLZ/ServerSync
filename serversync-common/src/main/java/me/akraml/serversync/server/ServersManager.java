@@ -82,6 +82,7 @@ public abstract class ServersManager {
      */
     public final void addServer(Server server) {
         this.servers.put(server.getName(), (ServerImpl) server);
+        registerInProxy(server);
     }
 
     /**
@@ -101,4 +102,11 @@ public abstract class ServersManager {
      * @param server The server to be unregistered from the proxy.
      */
     protected abstract void unregisterFromProxy(Server server);
+
+    /**
+     * Abstract method that should be implemented to register a server in the proxy server.
+     *
+     * @param server The server to be registered in the proxy.
+     */
+    protected abstract void registerInProxy(Server server);
 }
