@@ -13,10 +13,15 @@ import java.net.InetSocketAddress;
  * This manager handles the registration and un-registration of server instances specifically
  * for BungeeCord.
  */
-@RequiredArgsConstructor
 public final class BungeeServersManager extends ServersManager {
 
-    private final ProxyServer proxyServer;
+    private final BungeeServerSyncPlugin plugin;
+
+    public BungeeServersManager(final BungeeServerSyncPlugin plugin) {
+        this.plugin = plugin;
+        this.heartbeatSchedulerDelay = plugin.getConfig().getInt("heartbeat-scheduler-delay");
+        this.maxAliveTime = plugin.getConfig().getInt("max-alive-time");
+    }
 
     /**
      * Unregisters a server from the BungeeCord proxy. This removes the server from the list of
@@ -26,7 +31,7 @@ public final class BungeeServersManager extends ServersManager {
      */
     @Override
     protected void unregisterFromProxy(Server server) {
-        proxyServer.getServers().remove(server.getName());
+        plugin.getProxy().getServers().remove(server.getName());
     }
 
     /**
@@ -38,14 +43,14 @@ public final class BungeeServersManager extends ServersManager {
      */
     @Override
     protected void registerInProxy(Server server) {
-        if (proxyServer.getServers().get(server.getName()) == null) {
-            final ServerInfo serverInfo = proxyServer.constructServerInfo(
+        if (plugin.getProxy().getServers().get(server.getName()) == null) {
+            final ServerInfo serverInfo = plugin.getProxy().constructServerInfo(
                     server.getName(),
                     InetSocketAddress.createUnresolved(server.getIp(), server.getPort()),
                     "",
                     false
             );
-            proxyServer.getServers().put(server.getName(), serverInfo);
+            plugin.getProxy().getServers().put(server.getName(), serverInfo);
         }
     }
 }

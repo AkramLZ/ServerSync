@@ -1,5 +1,6 @@
 package me.akraml.serversync.bungee;
 
+import lombok.Getter;
 import me.akraml.serversync.ServerSync;
 import me.akraml.serversync.VersionInfo;
 import me.akraml.serversync.broker.RedisMessageBrokerService;
@@ -22,9 +23,10 @@ import java.nio.file.StandardCopyOption;
 /**
  * An implementation for ServerSync in BungeeCord platform.
  */
+@Getter
 public final class BungeeServerSyncPlugin extends Plugin {
 
-    private Configuration configuration;
+    private Configuration config;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
@@ -51,14 +53,14 @@ public final class BungeeServerSyncPlugin extends Plugin {
                 "\\__/\\___|_|    \\_/ \\___|_|  \\__/\\__, |_| |_|\\___|\n" +
                 "                                |___/            \n");
         getLogger().info("This server is running ServerSync " + VersionInfo.VERSION + " by AkramL.");
-        final ServersManager serversManager = new BungeeServersManager(getProxy());
+        final ServersManager serversManager = new BungeeServersManager(this);
         // Initialize message broker service.
-        final ConnectionType connectionType = ConnectionType.valueOf(configuration.getString("message-broker-service"));
+        final ConnectionType connectionType = ConnectionType.valueOf(config.getString("message-broker-service"));
         switch (connectionType) {
             case REDIS: {
                 getLogger().info("ServerSync will run under Redis message broker...");
                 long redisStartTime = System.currentTimeMillis();
-                final Configuration redisSection = configuration.getSection("redis");
+                final Configuration redisSection = config.getSection("redis");
                 final ConnectionCredentials credentials = ConnectionCredentials.newBuilder()
                         .addKey(RedisCredentialsKeys.HOST, redisSection.getString("host"))
                         .addKey(RedisCredentialsKeys.PORT, redisSection.getInt("port"))
@@ -106,7 +108,7 @@ public final class BungeeServerSyncPlugin extends Plugin {
                 Files.copy(inputStream, configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
         }
-        configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(configFile);
+        config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(configFile);
     }
 
 }

@@ -24,7 +24,6 @@
 
 package me.akraml.serversync.velocity;
 
-import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import lombok.RequiredArgsConstructor;
@@ -39,10 +38,15 @@ import java.util.Optional;
  * Extends the {@link ServersManager} to use the functionalities provided by the Velocity API,
  * applying the necessary actions to the proxy server when a server is added or removed.
  */
-@RequiredArgsConstructor
 public final class VelocityServersManager extends ServersManager {
 
-    private final ProxyServer proxyServer;
+    private final VelocityServerSyncPlugin plugin;
+
+    public VelocityServersManager(final VelocityServerSyncPlugin plugin) {
+        this.plugin = plugin;
+        this.heartbeatSchedulerDelay = plugin.getConfig().getLong("heartbeat-scheduler-delay").intValue();
+        this.maxAliveTime = plugin.getConfig().getLong("max-alive-time").intValue();
+    }
 
     /**
      * Unregisters a server from the proxy server.
@@ -53,10 +57,10 @@ public final class VelocityServersManager extends ServersManager {
      */
     @Override
     protected void unregisterFromProxy(Server server) {
-        final Optional<RegisteredServer> optional = proxyServer.getServer(server.getName());
+        final Optional<RegisteredServer> optional = plugin.getProxyServer().getServer(server.getName());
         if (optional.isEmpty()) return;
         final ServerInfo serverInfo = optional.get().getServerInfo();
-        proxyServer.unregisterServer(serverInfo);
+        plugin.getProxyServer().unregisterServer(serverInfo);
     }
 
     /**
@@ -71,6 +75,6 @@ public final class VelocityServersManager extends ServersManager {
                 server.getName(),
                 InetSocketAddress.createUnresolved(server.getIp(), server.getPort())
         );
-        if (proxyServer.getServer(server.getName()).isEmpty()) proxyServer.registerServer(serverInfo);
+        if (plugin.getProxyServer().getServer(server.getName()).isEmpty()) plugin.getProxyServer().registerServer(serverInfo);
     }
 }

@@ -31,6 +31,7 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
+import lombok.Getter;
 import me.akraml.serversync.ServerSync;
 import me.akraml.serversync.VersionInfo;
 import me.akraml.serversync.broker.RedisMessageBrokerService;
@@ -57,6 +58,7 @@ import java.nio.file.StandardCopyOption;
         authors = "AkramL",
         version = VersionInfo.VERSION
 )
+@Getter
 public final class VelocityServerSyncPlugin {
 
     private final ProxyServer proxyServer;
@@ -88,7 +90,7 @@ public final class VelocityServerSyncPlugin {
                                                 
                 """);
         logger.info("This server is running ServerSync " + VersionInfo.VERSION + " by AkramL.");
-        final ServersManager serversManager = new VelocityServersManager(proxyServer);
+        final ServersManager serversManager = new VelocityServersManager(this);
         // Initialize message broker service.
         final ConnectionType connectionType = ConnectionType.valueOf(config.getString("message-broker-service"));
         switch (connectionType) {

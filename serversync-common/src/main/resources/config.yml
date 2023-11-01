@@ -7,6 +7,12 @@
 # - REDIS
 # - RABBITMQ (Not ready yet)
 message-broker-service: 'REDIS'
+# The delay of repeating heartbeat check task in seconds (for proxies only!)
+heartbeat-scheduler-delay: 15
+# the maximum KeepAlive time to unregister the server in seconds (for proxies only!)
+max-alive-time: 30
+# How many seconds between each heartbeat? (For spigot)
+heartbeat-interval: 5
 
 # Here, you can configure important values to use redis as a message broker.
 # Ignore it if you are using RABBITMQ.
