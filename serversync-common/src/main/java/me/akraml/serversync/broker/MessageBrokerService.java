@@ -250,6 +250,7 @@ public abstract class MessageBrokerService {
                               final int port,
                               final int maxPlayers) {
         final JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("type", ServerMessageType.CREATE.name());
         jsonObject.addProperty("name", serverName);
         jsonObject.addProperty("ip", ip);
         jsonObject.addProperty("port", port);
