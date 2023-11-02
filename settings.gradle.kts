@@ -23,4 +23,4 @@
  */
 
 rootProject.name = "ServerSync"
-include("serversync-bungee", "serversync-velocity", "serversync-spigot", "serversync-common")
+include("serversync-common", "serversync-bungee", "serversync-velocity", "serversync-spigot")

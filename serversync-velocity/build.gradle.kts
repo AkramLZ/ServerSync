@@ -22,9 +22,6 @@
  * SOFTWARE.
  */
 
-group = "${parent?.group}"
-version = "${parent?.version}"
-
 repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
 }
@@ -38,4 +35,5 @@ dependencies {
 tasks.compileJava {
     sourceCompatibility = "16"
     targetCompatibility = "16"
+    dependsOn(":serversync-common:shadowJar")
 }

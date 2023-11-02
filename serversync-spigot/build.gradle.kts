@@ -22,9 +22,6 @@
  * SOFTWARE.
  */
 
-group = "${parent?.group}"
-version = "${parent?.version}"
-
 repositories {
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
 }
@@ -37,4 +34,5 @@ dependencies {
 tasks.compileJava {
     sourceCompatibility = "1.8"
     targetCompatibility = "1.8"
+    dependsOn(":serversync-common:shadowJar")
 }

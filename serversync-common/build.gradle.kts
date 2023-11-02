@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-group = "${parent?.group}"
-version = "${parent?.version}"
-
 tasks.compileJava {
     sourceCompatibility = "1.8"
     targetCompatibility = "1.8"
+}
+
+dependencies {
 }

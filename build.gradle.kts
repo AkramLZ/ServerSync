@@ -24,6 +24,7 @@
 
 plugins {
     id("java")
+    id("com.github.johnrengelman.shadow") version("7.1.2")
 }
 
 group = "me.akraml"
@@ -31,6 +32,10 @@ version = "1.0-BETA"
 
 subprojects {
     apply(plugin = "java")
+    apply(plugin = "com.github.johnrengelman.shadow")
+
+    group = "${parent?.group}"
+    version = "${parent?.version}"
 
     repositories {
         mavenCentral()
@@ -52,7 +57,7 @@ subprojects {
         val fileContent = """
         package $packageName;
 
-        public final class $className {
+        public final class $className { 
             public static final String VERSION = "${project.version}";
         }
     """.trimIndent()
@@ -75,6 +80,12 @@ subprojects {
 
     tasks.processResources {
         expand("projectVersion" to project.version)
+    }
+
+    tasks.shadowJar {
+        archiveBaseName.set(project.name)
+        archiveClassifier.set("")
+        archiveVersion.set(project.version.toString())
     }
 
     sourceSets["main"].java.srcDir(File(buildDir, "generated/sources/version"))
