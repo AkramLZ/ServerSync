@@ -41,7 +41,7 @@ import java.util.concurrent.CompletableFuture;
  * into message broker server.
  */
 @RequiredArgsConstructor
-public class SpigotServerSyncListener implements Listener {
+public final class SpigotServerSyncListener implements Listener {
 
     private final SpigotServerSyncPlugin plugin;
 
