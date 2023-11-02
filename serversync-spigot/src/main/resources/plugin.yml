@@ -1,0 +1,5 @@
+name: ServerSync
+author: AkramL
+version: ${projectVersion}
+description: Synchronize your spigot servers with proxies and manage them dynamically without extra configuration.
+main: me.akraml.serversync.spigot.SpigotServerSyncPlugin
