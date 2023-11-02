@@ -106,8 +106,8 @@ public final class VelocityServerSyncPlugin {
                         .addKey(RedisCredentialsKeys.MAX_TOTAL, redisTable.getLong("max-total").intValue())
                         .addKey(RedisCredentialsKeys.MAX_IDLE, redisTable.getLong("max-idle").intValue())
                         .addKey(RedisCredentialsKeys.MIN_IDLE, redisTable.getLong("min-idle").intValue())
-                        .addKey(RedisCredentialsKeys.MIN_EVICTABLE_IDLE_TIME, redisTable.getLong("min-evictable-idle-time").intValue())
-                        .addKey(RedisCredentialsKeys.TIME_BETWEEN_EVICTION_RUNS, redisTable.getLong("time-between-eviction-runs").intValue())
+                        .addKey(RedisCredentialsKeys.MIN_EVICTABLE_IDLE_TIME, redisTable.getLong("min-evictable-idle-time"))
+                        .addKey(RedisCredentialsKeys.TIME_BETWEEN_EVICTION_RUNS, redisTable.getLong("time-between-eviction-runs"))
                         .addKey(RedisCredentialsKeys.BLOCK_WHEN_EXHAUSTED, redisTable.getBoolean("block-when-exhausted"))
                         .build();
                 final RedisMessageBrokerService messageBrokerService = new RedisMessageBrokerService(
@@ -133,9 +133,10 @@ public final class VelocityServerSyncPlugin {
 
     private void loadConfig() throws IOException {
         final File dataFolder = new File("plugins/serversync");
-        if (!dataFolder.exists()) dataFolder.createNewFile();
-        final File configFile = new File("config.toml");
+        if (!dataFolder.exists()) dataFolder.mkdirs();
+        final File configFile = new File(dataFolder, "config.toml");
         if (!configFile.exists()) {
+            configFile.createNewFile();
             try (final InputStream inputStream = VelocityServerSyncPlugin.class.getResourceAsStream("/config.toml")) {
                 assert inputStream != null;
                 Files.copy(inputStream, configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -145,7 +146,8 @@ public final class VelocityServerSyncPlugin {
 
     @Subscribe
     public void onShutdown(final ProxyShutdownEvent event) {
-        ServerSync.getInstance().getMessageBrokerService().stop();
+        if (ServerSync.getInstance() != null)
+            ServerSync.getInstance().getMessageBrokerService().stop();
     }
 
 }

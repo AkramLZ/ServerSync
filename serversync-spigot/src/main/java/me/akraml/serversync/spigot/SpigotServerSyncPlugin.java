@@ -75,8 +75,8 @@ public final class SpigotServerSyncPlugin extends JavaPlugin {
                         .addKey(RedisCredentialsKeys.MAX_TOTAL, redisSection.getInt("max-total"))
                         .addKey(RedisCredentialsKeys.MAX_IDLE, redisSection.getInt("max-idle"))
                         .addKey(RedisCredentialsKeys.MIN_IDLE, redisSection.getInt("min-idle"))
-                        .addKey(RedisCredentialsKeys.MIN_EVICTABLE_IDLE_TIME, redisSection.getInt("min-evictable-idle-time"))
-                        .addKey(RedisCredentialsKeys.TIME_BETWEEN_EVICTION_RUNS, redisSection.getInt("time-between-eviction-runs"))
+                        .addKey(RedisCredentialsKeys.MIN_EVICTABLE_IDLE_TIME, redisSection.getLong("min-evictable-idle-time"))
+                        .addKey(RedisCredentialsKeys.TIME_BETWEEN_EVICTION_RUNS, redisSection.getLong("time-between-eviction-runs"))
                         .addKey(RedisCredentialsKeys.BLOCK_WHEN_EXHAUSTED, redisSection.getBoolean("block-when-exhausted"))
                         .build();
                 final RedisMessageBrokerService messageBrokerService = new RedisMessageBrokerService(

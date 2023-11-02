@@ -93,8 +93,8 @@ public final class BungeeServerSyncPlugin extends Plugin {
                         .addKey(RedisCredentialsKeys.MAX_TOTAL, redisSection.getInt("max-total"))
                         .addKey(RedisCredentialsKeys.MAX_IDLE, redisSection.getInt("max-idle"))
                         .addKey(RedisCredentialsKeys.MIN_IDLE, redisSection.getInt("min-idle"))
-                        .addKey(RedisCredentialsKeys.MIN_EVICTABLE_IDLE_TIME, redisSection.getInt("min-evictable-idle-time"))
-                        .addKey(RedisCredentialsKeys.TIME_BETWEEN_EVICTION_RUNS, redisSection.getInt("time-between-eviction-runs"))
+                        .addKey(RedisCredentialsKeys.MIN_EVICTABLE_IDLE_TIME, redisSection.getLong("min-evictable-idle-time"))
+                        .addKey(RedisCredentialsKeys.TIME_BETWEEN_EVICTION_RUNS, redisSection.getLong("time-between-eviction-runs"))
                         .addKey(RedisCredentialsKeys.BLOCK_WHEN_EXHAUSTED, redisSection.getBoolean("block-when-exhausted"))
                         .build();
                 final RedisMessageBrokerService messageBrokerService = new RedisMessageBrokerService(
@@ -121,12 +121,14 @@ public final class BungeeServerSyncPlugin extends Plugin {
 
     @Override
     public void onDisable() {
-        ServerSync.getInstance().getMessageBrokerService().stop();
+        if (ServerSync.getInstance() != null)
+            ServerSync.getInstance().getMessageBrokerService().stop();
     }
 
     private void loadConfig() throws IOException {
-        final File configFile = new File("config.toml");
+        final File configFile = new File(getDataFolder(), "config.yml");
         if (!configFile.exists()) {
+            configFile.createNewFile();
             try (final InputStream inputStream = getClass().getResourceAsStream("/config.yml")) {
                 assert inputStream != null;
                 Files.copy(inputStream, configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);

@@ -25,9 +25,9 @@ redis:
   password: "password-here"
   timeout: 5000 # In milliseconds.
   # Pool configuration values.
-  max-total: 1
-  max-idle: 1
-  min-idle: 1
+  max-total: 16
+  max-idle: 8
+  min-idle: 8
   block-when-exhausted: false
   min-evictable-idle-time: 60000
   time-between-eviction-runs: 30000
